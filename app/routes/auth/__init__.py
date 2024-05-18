@@ -61,8 +61,7 @@ def login(code: str):
             "picture": user.picture,
         }
     )
-def oauth():
-    googleAPI
+
 
 @auth_blueprint.route("/logout", methods=["POST"])
 @login_required

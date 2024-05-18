@@ -1,4 +1,3 @@
-from flask_login import UserMixin
 from sqlalchemy import (
     Column,
     DateTime,
@@ -11,7 +10,7 @@ from sqlalchemy.sql import func
 from app.extensions.db import db
 
 
-class User(db.Model, UserMixin):
+class User(db.Model):
     id = Column(
         Integer,
         primary_key=True,

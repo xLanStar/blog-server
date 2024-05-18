@@ -33,10 +33,10 @@ def get_posts():
         decrypted_posts = [
             {
                 "id": post.id,
-                # "likes": post.likes,
                 "text": decrypt(post.text_iv, post.text),
                 "comments": [
                     {
+                        "id": comment.id,
                         "text": decrypt(comment.text_iv, comment.text),
                         "author_id": comment.user.id,
                         "author_name": comment.user.name,
@@ -56,7 +56,6 @@ def get_posts():
             }
             for post in posts
         ]
-        print(decrypted_posts)
     except ValueError as e:
         return f"解密過程中出現錯誤: {str(e)}", 500
 
@@ -151,12 +150,12 @@ def edit_post(id: int, **kwargs):
         logging.error("Failed to add, delete, or modify a post.")
         return "你沒有權限編輯", 403
 
-    for key, value in kwargs.items():
-        if value is not None:
-            setattr(post, key, value)
     if "text" in kwargs:
-        post.text = encrypt(kwargs["text"])
-        post.text_hash = get_hash(post.text)
+        text_iv, encrypted_text = encrypt(kwargs["text"])
+        post.text = encrypted_text
+        post.text_hash = get_hash(encrypted_text)
+        post.text_iv = text_iv
+
     db.session.commit()
 
     # 新增編輯貼文記錄
@@ -169,7 +168,7 @@ def edit_post(id: int, **kwargs):
 
     logging.debug(f"User {current_user} edited a post.")
 
-    return "編輯成功(TEMP)"
+    return "編輯成功"
 
 
 @post_blueprint.route("/like/<int:id>", methods=["POST"])
