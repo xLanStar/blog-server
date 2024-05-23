@@ -114,7 +114,16 @@ def delete_post(id: int):
         logging.error("Failed to add, delete, or modify a post.")
         return "你沒有權限刪除", 403
 
-    Comment.filter(post_id=id).delete()
+    comments = Comment.query.filter_by(post_id=id)
+
+    for _ in comments:
+        log = Log(
+            user_id=current_user.id,
+            action="Delete-Comment",
+        )
+        db.session.add(log)
+
+    comments.delete()
     db.session.delete(post)
     db.session.commit()
 
