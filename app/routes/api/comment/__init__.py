@@ -6,7 +6,7 @@ from webargs.flaskparser import use_kwargs
 
 from app.extensions.db import db
 from app.extensions.oauth import get_current_user, login_required
-from app.models import Comment, Log
+from app.models import Post, Comment, Log
 from app.utils.hash import get_hash
 from app.utils.cipher import encrypt, decrypt
 
@@ -23,7 +23,7 @@ comment_blueprint = Blueprint("comment", __name__, url_prefix="/comment")
 )
 @login_required
 def create_comment(post_id: int, text: str):
-    post: Comment | None = Comment.query.get(post_id)
+    post: Post | None = Post.query.get(post_id)
     if post is None:
         logging.error("Failed to add a comment.")
         return "找不到貼文", 404
