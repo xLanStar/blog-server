@@ -61,13 +61,13 @@ def delete_comment(id: int):
     comment: Comment | None = Comment.query.get(id)
     if comment is None:
         logging.error("Failed to delete a comment.")
-        return "找不到留言"
+        return "找不到留言", 404
 
     current_user = get_current_user()
 
     if current_user.id != comment.user_id:
         logging.error("Failed to delete a comment.")
-        return "你沒有權限刪除"
+        return "你沒有權限刪除", 403
 
     db.session.delete(comment)
     db.session.commit()
