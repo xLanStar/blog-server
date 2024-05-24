@@ -25,16 +25,12 @@ def login_user(code: str) -> User:
             "grant_type": "authorization_code",
         },
     ).json()
-    session["access_token"] = response["access_token"]
-    session["refresh_token"] = response["refresh_token"]
-    session["id_token"] = response["id_token"]
     # Token contains user info(like email, name, picture)
     token_content = id_token.verify_oauth2_token(
         id_token=response["id_token"],
         request=Request(),
         audience=GOOGLE_CLIENT_ID,
     )
-    session["token_content"] = token_content
 
     user = User.query.filter_by(email=token_content["email"]).first()
     if user is None:
