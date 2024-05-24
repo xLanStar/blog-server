@@ -110,10 +110,12 @@ def delete_post(id: int):
 
     current_user = get_current_user()
 
+    # 檢查權限
     if current_user.id != post.user_id:
         logging.error("Failed to add, delete, or modify a post.")
         return "你沒有權限刪除", 403
 
+    # 刪除此文章的所有留言、喜歡紀錄
     comments = Comment.query.filter_by(post_id=id)
 
     for _ in comments:
@@ -123,7 +125,17 @@ def delete_post(id: int):
         )
         db.session.add(log)
 
+    post_likes = PostLike.query.filter_by(post_id=id)
+
+    for _ in post_likes:
+        log = Log(
+            user_id=current_user.id,
+            action="Delete-Post-Like",
+        )
+        db.session.add(log)
+
     comments.delete()
+    post_likes.delete()
     db.session.delete(post)
     db.session.commit()
 
@@ -155,10 +167,12 @@ def edit_post(id: int, **kwargs):
 
     current_user = get_current_user()
 
+    # 檢查權限
     if current_user.id != post.user_id:
         logging.error("Failed to add, delete, or modify a post.")
         return "你沒有權限編輯", 403
 
+    # 編輯貼文
     if "text" in kwargs:
         text_iv, encrypted_text = encrypt(kwargs["text"])
         post.text = encrypted_text

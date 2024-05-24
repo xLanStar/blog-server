@@ -65,10 +65,12 @@ def delete_comment(id: int):
 
     current_user = get_current_user()
 
+    # 檢查權限
     if current_user.id != comment.user_id:
         logging.error("Failed to delete a comment.")
         return "你沒有權限刪除", 403
 
+    # 刪除留言
     db.session.delete(comment)
     db.session.commit()
 
@@ -100,10 +102,12 @@ def edit_comment(id: int, **kwargs):
 
     current_user = get_current_user()
 
+    # 檢查權限
     if current_user.id != comment.user_id:
         logging.error("Failed to add, delete, or modify a comment.")
         return "你沒有權限編輯", 403
 
+    # 編輯留言
     if "text" in kwargs:
         text_iv, encrypted_text = encrypt(kwargs["text"])
         comment.text = encrypted_text
