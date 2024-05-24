@@ -25,6 +25,7 @@ def login_user(code: str) -> User:
             "grant_type": "authorization_code",
         },
     ).json()
+
     # Token contains user info(like email, name, picture)
     token_content = id_token.verify_oauth2_token(
         id_token=response["id_token"],
@@ -55,7 +56,6 @@ def login_user(code: str) -> User:
 
 
 def logout_user():
-    print("logging out")
     session.clear()
 
 
@@ -69,9 +69,7 @@ def get_current_user() -> User | None:
 def login_required(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
-        print("validating")
         if "user_id" not in session:
-            print("aborting")
             return abort(401)
         else:
             return function(*args, **kwargs)
